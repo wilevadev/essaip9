@@ -18,37 +18,31 @@ function setError (element, errorMessage) {
 }
 
 // Fonction de recherche principale qui filtre les recettes en fonction d'une requête
-export function recherchePrincipale (recettes, requete) {
-  // Nettoyer et normaliser la requête en supprimant les espaces et en la convertissant en minuscules
+export function recherchePrincipale(recettes, requete) {
   requete = requete.trim().toLowerCase()
-
-  // Filtrer les recettes : garder celles dont le nom, la description ou un ingrédient contient la requête
-  return recettes.filter(recette =>
-    recette.name.toLowerCase().includes(requete) || // Vérifier si le nom de la recette contient la requête
-    recette.description.toLowerCase().includes(requete) || // Vérifier si la description de la recette contient la requête
-    recette.ingredients.some(ingredient => ingredient.ingredient.toLowerCase().includes(requete)) // Vérifier si un ingrédient contient la requête
-  )
+  return recettes.filter(recette => {
+    let matchFound = false
+    if (recette.name.toLowerCase().includes(requete)) {
+      matchFound = true
+    } else if (recette.description.toLowerCase().includes(requete)) {
+      matchFound = true
+    } else {
+      matchFound = recette.ingredients.some(ingredient => ingredient.ingredient.toLowerCase().includes(requete))
+    }
+    return matchFound
+  })
 }
 
-// Fonction pour filtrer les recettes en fonction des tags sélectionnés
-export function filterRecipesByTags (recipes, selectedTags) {
-  // Filtrer les recettes : vérifier si chaque recette contient tous les tags sélectionnés
-  return recipes.filter((recipe) => {
-    const { ingredients, ustensils, appliance } = recipe // Extraire les ingrédients, ustensiles, et l'appareil de chaque recette
-
-    // Vérifier si chaque tag correspond à un ingrédient, un ustensile ou un appareil
-    return selectedTags.every((tag) => {
-      return (
-        ingredients.some((ing) => // Vérifier les ingrédients
-          ing.ingredient.toLowerCase().includes(tag)
-        ) ||
-        ustensils.some((ustensil) => // Vérifier les ustensiles
-          ustensil.toLowerCase().includes(tag)
-        ) ||
-        appliance.toLowerCase().includes(tag) // Vérifier l'appareil
-      )
-    })
-  })
+export function filterRecipesByTags(recipes, selectedTags) {
+  return recipes.filter(recipe => {
+    const { ingredients, ustensils, appliance } = recipe
+    return selectedTags.every(tag => {
+      let tagFound = ingredients.some(ing => ing.ingredient.toLowerCase().includes(tag)) ||
+                     ustensils.some(ustensil => ustensil.toLowerCase().includes(tag)) ||
+                     appliance.toLowerCase().includes(tag);
+      return tagFound
+    });
+  });
 }
 
 // Fonction pour filtrer les recettes en fonction de la recherche principale et des tags
